@@ -1,7 +1,7 @@
 {
-  "version": "1.4.2",
+  "version": "1.0.0",
   "manifest_version": 2,
-  "name": "exp",
+  "name": "JS-pointer",
   "permissions": [
     "proxy",
     "tabs",
@@ -14,11 +14,12 @@
   "content_scripts":[
     {
       "all_frames":true,
-      "js":["inject.js", "poinetr.js"],
+      "js":["inject.js"],
       "matches":["http://*/*","https://*/*"],
       "match_about_blank":false,
       "run_at":"document_start"
     }
   ],
+  "web_accessible_resources": ["script.js"],
   "minimum_chrome_version":"22.0.0"
 }
