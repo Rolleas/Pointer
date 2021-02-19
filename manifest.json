@@ -11,6 +11,12 @@
     "webRequest",
     "webRequestBlocking"
   ],
+  "background": {
+    "scripts": [
+      "jquery.js"
+    ],
+    "persistent":true
+  },
   "content_scripts":[
     {
       "all_frames":true,
@@ -20,6 +26,6 @@
       "run_at":"document_start"
     }
   ],
-  "web_accessible_resources": ["script.js"],
+  "web_accessible_resources": ["script.js", "jquery.js"],
   "minimum_chrome_version":"22.0.0"
 }

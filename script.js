@@ -1,7 +1,6 @@
-var virtualpointer = function() {
+var pointer = function() {
     'use strict';
 
-    // some default values for running events
     var mouse_position          = {x: 1, y: 1},
         event_queue             = [],
         default_interval        = 20,
@@ -11,14 +10,14 @@ var virtualpointer = function() {
         default_screen_x_offset = 1,
         default_screen_y_offset = 30;
 
-    // function to dispatch event inside the browser
+
     function send_event(type, clientX, clientY, element, button, screenX, screenY, isTouchEvent, scrollLeft, scrollTop) {
         if (type == 'scroll') {
             window.scrollTo(scrollLeft, scrollTop);
             return;
         }
 
-        // calculate screenX and screenY if not provided
+
         if (!screenX) {
             screenX = clientX + default_screen_x_offset;
         }
@@ -26,16 +25,15 @@ var virtualpointer = function() {
             screenY = clientY + default_screen_y_offset;
         }
 
-        // if button is not specified, assume the button is the left mouse button
+
         if (!button && ( type === 'click' || type === 'mousedown' || type === 'mouseup') ) {
-            button = 0; // left button is default
-            // TODO: handle IE8 and below where left button = 0
+            button = 0;
         }
 
-        // detail is the value for # of times this element has been clicked, set it to 1 when doing click events
+
         var detail = (type !== 'mousemove' && type !== 'touchmove') ? 1 : 0;
 
-        // construct new event object, either touch or mouse event
+
         if (isTouchEvent &&
             ( ('ontouchstart' in window) || (navigator.msMaxTouchPoints > 0) )
         ) {
@@ -46,10 +44,10 @@ var virtualpointer = function() {
             var eventObject = document.createEvent("MouseEvent");
             eventObject.initMouseEvent(type,  true, true, window, detail, screenX, screenY, clientX, clientY, false, false, false, false, button, null);
         }
-        // if element specified, fire event on the element object
+
         if (element) {
             element.dispatchEvent(eventObject);
-            // otherwise fire event on document.body
+
         } else {
             document.body.dispatchEvent(eventObject);
         }
@@ -57,7 +55,7 @@ var virtualpointer = function() {
         mouse_position = {x: screenX, y: screenY};
     }
 
-    // processes event stack
+
     function process_event_queue() {
         if (event_queue.length) {
             var current_event = event_queue[0],
@@ -74,27 +72,27 @@ var virtualpointer = function() {
     }
 
     function get_offset_of_element(element) {
-        // calculate position of element
+
         var body_rect = document.body.getBoundingClientRect(),
             elem_rect = element.getBoundingClientRect(),
             y_offset  = elem_rect.top - body_rect.top,
             x_offset  = elem_rect.left - body_rect.left;
 
-        // return values
+
         return {x: x_offset, y: y_offset};
     }
 
-    // constructs mouse movement stack to move mouse to an element over a set amount of time
+
     function build_mouse_movement_queue(element, duration, is_mobile) {
-        // calculate position of element
+
         var element_offset = get_offset_of_element(element);
 
-        // calculate distance
+
         var x_distance = element_offset.x - mouse_position.x,
             y_distance = element_offset.y - mouse_position.y;
 
-        // determine number of increments
-        var increments = duration / default_interval; // divide number of milliseconds for duration by 20, since we want to send events every 20ish milliseconds
+
+        var increments = duration / default_interval;
         for (var i = 1; i <= increments; i++) {
             var new_x_pos = Math.round(x_distance / increments * i) + mouse_position.x,
                 new_y_pos = Math.round(y_distance / increments * i) + mouse_position.y;
@@ -111,19 +109,18 @@ var virtualpointer = function() {
 
     }
 
-    // construct click event stack to click on an element
+
     function build_click_event_queue(element, duration, is_mobile) {
-        // calculate position of element
+
         var element_offset = get_offset_of_element(element);
 
-        // get timestamp of last event in queue
+
         var last_timestamp = (event_queue.length) ? event_queue[event_queue.length - 1].timestamp : 0;
 
         if (!duration) {
             duration = default_click_duration;
         }
 
-        // mobile events are different (touchstart)
         if (is_mobile) {
             var screen_x = element_offset.x,
                 screen_y = element_offset.y;
@@ -225,15 +222,15 @@ var virtualpointer = function() {
 
     }
 
-    // move screen to element with correct touch events, as in mobile or tablet browser
+
     function build_flick_event_queue(element, duration) {
-        // calculate position of element
+
         var body_rect = document.body.getBoundingClientRect(),
             elem_rect = element.getBoundingClientRect(),
             y_offset  = elem_rect.top - body_rect.top,
             x_offset  = elem_rect.left - body_rect.left;
 
-        // calculate distance
+
         var x_distance = x_offset - mouse_position.x,
             y_distance = y_offset - mouse_position.y;
 
@@ -250,8 +247,7 @@ var virtualpointer = function() {
             isTouchEvent: true
         });
 
-        // determine number of increments
-        var increments = duration / default_interval; // divide number of milliseconds for duration by 20, since we want to send events every 20ish milliseconds
+        var increments = duration / default_interval;
         for (var i = 1; i <= increments; i++) {
             var new_x_pos = Math.round(x_distance / increments * i) + mouse_position.x,
                 new_y_pos = Math.round(y_distance / increments * i) + mouse_position.y;
@@ -268,7 +264,6 @@ var virtualpointer = function() {
             });
         }
 
-        // get timestamp of last event in queue
         var last_timestamp = (event_queue.length) ? event_queue[event_queue.length - 1].timestamp : 0;
 
         event_queue.push({
@@ -282,34 +277,43 @@ var virtualpointer = function() {
             isTouchEvent: true
         });
     }
+    function random_coords(i){
+        return Math.floor(Math.random() * (i - 0) + 0)
+    }
 
-    // function to begin execution of events inside event_queue
     function start_processing_events() {
         setTimeout(process_event_queue, first_event_offset);
     }
 
-    function event_generator(){
-        virtualpointer.run_serialized_events(
-            [
-                {"type": "mousemove", "pageX": 105, "pageY": 198, "screenX": 120, "screenY": 258, "timestamp": 100},
-                {"type": "mousemove", "pageX": 135, "pageY": 228, "screenX": 150, "screenY": 288, "timestamp": 140},
-                {"type": "mousemove", "pageX": 145, "pageY": 238, "screenX": 160, "screenY": 298, "timestamp": 155},
-                {"type": "mousemove", "pageX": 165, "pageY": 258, "screenX": 180, "screenY": 328, "timestamp": 180},
-                {"type": "mousemove", "pageX": 165, "pageY": 258, "screenX": 180, "screenY": 328, "timestamp": 180},
-                {"type": "mousedown", "pageX": 169, "pageY": 261, "screenX": 184, "screenY": 331, "timestamp": 201},
-                {"type": "mouseup", "pageX": 169, "pageY": 261, "screenX": 184, "screenY": 331, "timestamp": 209},
-                {"type": "click", "pageX": 169, "pageY": 261, "screenX": 184, "screenY": 331, "timestamp": 211}
-            ]);
-    }
-
-    // exposed functions that can be valled using virtualpointer.function_name();
     return {
-        inaction_emulated : function (duration){
-            if (!duration) return;
-
-            event_generator();
-
+        inaction_emulated : function (){
+            let event_list = []
+            console.log(random_coords());
+            for(let i  = 0; i < 10000; i++) {
+                //let type_element_by_random = Math.floor(Math.random() * 80);
+                event_list.push({"type": "mousemove",
+                    "pageX": random_coords(i),
+                    "pageY": random_coords(i),
+                    "screenX": random_coords(i),
+                    "screenY": random_coords(i),
+                    "timestamp": Math.floor(Math.random() * (100 - 50) + 50)})
+            }
+            console.log(event_list);
+            pointer.run_serialized_events(event_list);
         },
+
+        move_mouse_to_random_element: function(count_of_elements) {
+            for(let i = 0; i < count_of_elements; i++){
+                let dom_list_by_tag_a = document.getElementsByTagName("a");
+                let index_of_element = Math.floor(Math.random() * dom_list_by_tag_a.length);
+                let choice_element = dom_list_by_tag_a[index_of_element];
+
+                let duration = Math.floor(Math.random() * (3000 - 1000) + 1000);
+                build_mouse_movement_queue(choice_element, duration);
+                start_processing_events();
+            }
+        },
+
         move_mouse_to_element: function(element, duration) {
             if (!element) return;
 
@@ -322,7 +326,7 @@ var virtualpointer = function() {
             build_click_event_queue(element);
             start_processing_events();
         },
-        move_to_element_and_click: function(duration) {
+        move_to_random_element_and_click: function(duration) {
 
             let dom_list_by_tag_a = document.getElementsByTagName("a");
             let index_of_element = Math.floor(Math.random() * dom_list_by_tag_a.length);
