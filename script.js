@@ -302,15 +302,30 @@ var pointer = function() {
             pointer.run_serialized_events(event_list);
         },
 
+        move_mouse_to_random_element_and_click: function(count_of_elements) {
+            for(let i = 0; i < count_of_elements; i++){
+                let dom_list_by_tag_a = document.getElementsByTagName("a");
+                let index_of_element = Math.floor(Math.random() * dom_list_by_tag_a.length);
+                let choice_element = dom_list_by_tag_a[index_of_element];
+
+                let duration = Math.floor(Math.random() * (30000 - 10000) + 10000);
+                build_mouse_movement_queue(choice_element, duration);
+                build_click_event_queue(choice_element);
+                start_processing_events();
+                setTimeout(Math.floor(Math.random() * (30000 - 10000) + 10000));
+            }
+        },
+
         move_mouse_to_random_element: function(count_of_elements) {
             for(let i = 0; i < count_of_elements; i++){
                 let dom_list_by_tag_a = document.getElementsByTagName("a");
                 let index_of_element = Math.floor(Math.random() * dom_list_by_tag_a.length);
                 let choice_element = dom_list_by_tag_a[index_of_element];
 
-                let duration = Math.floor(Math.random() * (3000 - 1000) + 1000);
+                let duration = Math.floor(Math.random() * (30000 - 10000) + 10000);
                 build_mouse_movement_queue(choice_element, duration);
                 start_processing_events();
+                setTimeout(Math.floor(Math.random() * (30000 - 10000) + 10000));
             }
         },
 
