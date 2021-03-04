@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "manifest_version": 2,
-  "name": "JS-pointer",
+  "name": "Pointer",
   "permissions": [
     "proxy",
     "tabs",
@@ -11,21 +11,14 @@
     "webRequest",
     "webRequestBlocking"
   ],
-  "background": {
-    "scripts": [
-      "jquery.js"
-    ],
-    "persistent":true
-  },
   "content_scripts":[
     {
-      "all_frames":true,
-      "js":["inject.js"],
-      "matches":["http://*/*","https://*/*"],
-      "match_about_blank":false,
-      "run_at":"document_start"
-    }
-  ],
-  "web_accessible_resources": ["script.js", "jquery.js"],
+      "all_frames": true,
+      "matches": ["*://*/*"],
+      "match_about_blank": true,
+      "run_at": "document_start",
+      "js":["js/inject.js"]
+    }],
+  "web_accessible_resources": ["js/script.js"],
   "minimum_chrome_version":"22.0.0"
 }
