@@ -16,7 +16,6 @@ Example
 
 
 * Move mouse to random element
------------------------------------
 >```javascript
 >pointer.move_mouse_to_random_element()
 >````
