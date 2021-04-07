@@ -277,8 +277,19 @@ var pointer = function() {
             isTouchEvent: true
         });
     }
-    function random_coords(i){
-        return Math.floor(Math.random() * (i - 0) + 0)
+
+    function find_element(selector){
+        var element = document.querySelectorAll(selector);
+        return element[0];
+    }
+
+    function get_element(){
+        var elements = document.querySelectorAll("a");
+        return elements[Math.floor(Math.random() * elements.length)];
+    }
+
+    function duration(){
+        return Math.floor(Math.random() * (3000 - 1000) + 1000);
     }
 
     function start_processing_events() {
@@ -287,61 +298,30 @@ var pointer = function() {
 
     return {
         move_to_random_element_and_click: function() {
-            let dom_list_by_tag_a = document.getElementsByTagName("a");
-            let index_of_element = Math.floor(Math.random() * dom_list_by_tag_a.length);
-            let choice_element = dom_list_by_tag_a[index_of_element];
-
-            let duration = Math.floor(Math.random() * (30000 - 10000) + 10000);
-            build_mouse_movement_queue(choice_element, duration);
-            build_click_event_queue(choice_element);
-            start_processing_events();
-            setTimeout(Math.floor(Math.random() * (30000 - 10000) + 10000));
-        },
-
-        move_mouse_to_random_element: function(count_of_elements) {
-            for(let i = 0; i < count_of_elements; i++){
-                let dom_list_by_tag_a = document.getElementsByTagName("a");
-                let index_of_element = Math.floor(Math.random() * dom_list_by_tag_a.length);
-                let choice_element = dom_list_by_tag_a[index_of_element];
-
-                let duration = Math.floor(Math.random() * (30000 - 10000) + 10000);
-                build_mouse_movement_queue(choice_element, duration);
-                start_processing_events();
-                setTimeout(Math.floor(Math.random() * (30000 - 10000) + 10000));
-            }
-        },
-
-        move_mouse_to_element: function(element, duration) {
-            if (!element) return;
-
-            build_mouse_movement_queue(element, duration);
-            start_processing_events();
-        },
-        click_element: function(element) {
-            if (!element) return;
-
+            var element = get_element();
+            build_mouse_movement_queue(element, duration());
             build_click_event_queue(element);
             start_processing_events();
         },
-        tap_element: function(element) {
-            if (!element) return;
 
-            build_click_event_queue(element, null, true);
+        move_mouse_to_random_element: function() {
+            var element = get_element();
+            build_mouse_movement_queue(element, duration());
             start_processing_events();
         },
-        double_tap_element: function(element) {
-            if (!element) return;
 
-            build_click_event_queue(element, null, true);
-            build_click_event_queue(element, 25, true);
+        move_mouse_to_element: function(selector) {
+            var element = find_element(selector);
+            build_mouse_movement_queue(element, duration);
             start_processing_events();
         },
-        flick_to_element: function(element, duration) {
-            if (!element) return;
 
-            build_flick_event_queue(element, duration);
+        click_element: function(selector) {
+            var element = find_element(selector);
+            build_click_event_queue(element);
             start_processing_events();
         },
+
         run_serialized_events: function(events) {
             if (!events || ! events instanceof Array) return;
 
