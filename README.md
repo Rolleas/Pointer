@@ -25,11 +25,14 @@ Example
 >```javascript
 >pointer.move_mouse_to_element(selector)
 >````
+> moves the cursor to the element by css selector
 
 * Click to element by css selector
 >```javascript
 >pointer.click_element(selector)
 >````
+> click to the element by css selector
+
 
 To do
 =====================
